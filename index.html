@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Investment Simulation</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <h1>Investment Simulation</h1>
@@ -23,7 +23,21 @@
     <button onclick="sellStock()">Sell</button>
     <p id="feedback" class="feedback"></p>
   </div>
-  <canvas id="stockChart" width="400" height="200"></canvas> <!-- Placeholder for the stock chart -->
+  <canvas id="stockChart" width="400" height="200"></canvas>
+
+  <!-- Stock Detail Modal -->
+  <div id="stockModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modal-title">Stock Details</h2>
+      <p id="modal-description"></p>
+      <p>Current Price: $<span id="modal-price"></span></p>
+      <p>Owned: <span id="modal-owned"></span></p>
+      <canvas id="modalChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
+
