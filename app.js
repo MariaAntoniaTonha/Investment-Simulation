@@ -2,16 +2,59 @@
 let balance = 1000;
 const feedbackElement = document.getElementById('feedback');
 const stockInfoElement = document.getElementById('stock-info');
+const stockChartElement = document.getElementById('stockChart').getContext('2d');
 
-// Define stocks with descriptions, initial prices, and quantity owned
+// Define stocks with descriptions, initial prices, quantity owned, and price history
 const stocks = {
-  "TechCorp": { price: 50, owned: 0, description: "Leading tech company" },
-  "HealthInc": { price: 30, owned: 0, description: "Healthcare services" },
-  "FinanceCo": { price: 20, owned: 0, description: "Financial services firm" },
-  "EnergyPlus": { price: 40, owned: 0, description: "Renewable energy provider" },
-  "GreenGrow": { price: 25, owned: 0, description: "Sustainable agriculture" },
-  "AutoDrive": { price: 35, owned: 0, description: "Automated vehicle producer" }
+  "TechCorp": { price: 50, owned: 0, description: "Leading tech company", history: [50] },
+  "HealthInc": { price: 30, owned: 0, description: "Healthcare services", history: [30] },
+  "FinanceCo": { price: 20, owned: 0, description: "Financial services firm", history: [20] },
+  "EnergyPlus": { price: 40, owned: 0, description: "Renewable energy provider", history: [40] },
+  "GreenGrow": { price: 25, owned: 0, description: "Sustainable agriculture", history: [25] },
+  "AutoDrive": { price: 35, owned: 0, description: "Automated vehicle producer", history: [35] }
 };
+
+// Initialize the chart
+let stockChart = new Chart(stockChartElement, {
+  type: 'line',
+  data: {
+    labels: [0], // Initial time label
+    datasets: [
+      {
+        label: 'Stock Price',
+        data: stocks["TechCorp"].history, // Start with TechCorp's price history
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Transaction Count'
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Price ($)'
+        }
+      }
+    }
+  }
+});
+
+// Function to update the chart with a new stock's history
+function updateChart(stock) {
+  const stockData = stocks[stock].history;
+  stockChart.data.labels = Array.from({ length: stockData.length }, (_, i) => i);
+  stockChart.data.datasets[0].data = stockData;
+  stockChart.update();
+}
 
 // Populate stock list and dropdown
 const stockSelect = document.getElementById('stock-select');
@@ -41,17 +84,19 @@ function updateDisplay() {
   }
 }
 
-// Show selected stock information when changed
+// Show selected stock information and update the chart
 stockSelect.addEventListener("change", () => {
   const stock = stockSelect.value;
   const { price, description } = stocks[stock];
   stockInfoElement.textContent = `${stock} - ${description}, Current Price: $${price.toFixed(2)}`;
+  updateChart(stock);
 });
 
 // Simulate stock price changes
 function simulatePriceChange(stock) {
   const randomChange = (Math.random() - 0.5) * 10; // Random change between -5 and +5
   stocks[stock].price = Math.max(1, stocks[stock].price + randomChange);
+  stocks[stock].history.push(stocks[stock].price); // Update history with the new price
 }
 
 // Buy stock function
@@ -63,6 +108,7 @@ function buyStock() {
     simulatePriceChange(stock);
     updateDisplay();
     displayFeedback(`Bought 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`, "success");
+    updateChart(stock); // Update the chart after buying
   } else {
     displayFeedback("Not enough balance to buy!", "error");
   }
@@ -77,6 +123,7 @@ function sellStock() {
     simulatePriceChange(stock);
     updateDisplay();
     displayFeedback(`Sold 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`, "success");
+    updateChart(stock); // Update the chart after selling
   } else {
     displayFeedback("You don't own any of this stock!", "error");
   }
@@ -92,5 +139,4 @@ function displayFeedback(message, type = "success") {
     feedbackElement.textContent = "";
   }, 3000);
 }
-
 
