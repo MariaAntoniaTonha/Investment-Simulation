@@ -73,6 +73,31 @@ function updateDisplay() {
     stockSelect.appendChild(option);
   }
 }
+// Function to add funds to balance with a maximum limit of $500
+function addFunds() {
+  const fundAmount = parseFloat(document.getElementById("fund-amount").value);
+  const fundFeedback = document.getElementById("fund-feedback");
+
+  // Check if fundAmount is valid and within allowed range
+  if (isNaN(fundAmount) || fundAmount < 1 || fundAmount > 500) {
+    fundFeedback.textContent = "Please enter an amount between 1 and 500.";
+    fundFeedback.style.color = "red";
+    return;
+  }
+
+  // Add the funds to the balance and update display
+  balance += fundAmount;
+  document.getElementById("balance").textContent = balance.toFixed(2);
+  fundFeedback.textContent = `$${fundAmount} added to your balance successfully!`;
+  fundFeedback.style.color = "green";
+
+  // Clear input field and reset feedback message after 3 seconds
+  document.getElementById("fund-amount").value = "";
+  setTimeout(() => {
+    fundFeedback.textContent = "";
+  }, 3000);
+}
+
 
 // Buy, sell, feedback functions (as previously set up)
 
