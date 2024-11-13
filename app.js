@@ -1,68 +1,100 @@
-// Initial portfolio balance
-let balance = 1000;
-const feedbackElement = document.getElementById('feedback');
-const stockInfoElement = document.getElementById('stock-info');
-const stockChartElement = document.getElementById('stockChart').getContext('2d');
-const modal = document.getElementById('stockModal');
-const modalTitle = document.getElementById('modal-title');
-const modalDescription = document.getElementById('modal-description');
-const modalPrice = document.getElementById('modal-price');
-const modalOwned = document.getElementById('modal-owned');
-const modalChartElement = document.getElementById('modalChart').getContext('2d');
+// script.js
+let balance = 500;
+const maxFunds = 500;
+const stocks = [
+  { name: "Stock A", price: 100 },
+  { name: "Stock B", price: 150 },
+  { name: "Stock C", price: 75 },
+  { name: "Stock D", price: 200 },
+  { name: "Stock E", price: 50 },
+  { name: "Stock F", price: 120 },
+];
+let investments = {};
 
-// Example stocks with price history
-const stocks = {
-  "TechCorp": { price: 50, owned: 0, description: "Leading tech company", history: [50] },
-  "HealthInc": { price: 30, owned: 0, description: "Healthcare services", history: [30] },
-  "FinanceCo": { price: 20, owned: 0, description: "Financial services firm", history: [20] },
-  "EnergyPlus": { price: 40, owned: 0, description: "Renewable energy provider", history: [40] },
-  "GreenGrow": { price: 25, owned: 0, description: "Sustainable agriculture", history: [25] },
-  "AutoDrive": { price: 35, owned: 0, description: "Automated vehicle producer", history: [35] }
-};
+const balanceEl = document.getElementById('balance');
+const stockListEl = document.getElementById('stocks');
+const stockDetailsEl = document.getElementById('stock-details');
 
-// Function to open the stock modal
-function openModal(stock) {
-  const selectedStock = stocks[stock];
-  modalTitle.textContent = stock;
-  modalDescription.textContent = selectedStock.description;
-  modalPrice.textContent = selectedStock.price.toFixed(2);
-  modalOwned.textContent = selectedStock.owned;
+// Display available stocks
+stocks.forEach((stock, index) => {
+  const li = document.createElement('li');
+  li.textContent = `${stock.name} - $${stock.price}`;
+  li.onclick = () => showStockInfo(index);
+  stockListEl.appendChild(li);
+});
 
-  // Update modal chart data with stock price history
-  modalChart.data.labels = Array.from({ length: selectedStock.history.length }, (_, i) => i);
-  modalChart.data.datasets[0].data = selectedStock.history;
-  modalChart.update();
-
-  modal.style.display = "block";
+// Update the balance display
+function updateBalance() {
+  balanceEl.textContent = `Balance: $${balance}`;
 }
 
-// Function to close the modal
-function closeModal() {
-  modal.style.display = "none";
+// Show details about a stock when clicked
+function showStockInfo(index) {
+  const stock = stocks[index];
+  stockDetailsEl.textContent = `${stock.name}: $${stock.price}. ${
+    investments[stock.name] ? "You own shares." : "Click to buy."
+  }`;
 }
 
-// Update the stock list dynamically
-function updateDisplay() {
-  document.getElementById('balance').textContent = balance.toFixed(2);
-  const stockList = document.getElementById('stock-list');
-  const stockSelect = document.getElementById('stock-select');
-  
-  stockList.innerHTML = '';
-  stockSelect.innerHTML = '';
-  
-  for (const stock in stocks) {
-    const { price, owned, description } = stocks[stock];
-    
+// Function to simulate stock price changes every minute
+setInterval(() => {
+  stocks.forEach(stock => {
+    stock.price += (Math.random() - 0.5) * 5; // Simulate price change
+  });
+  renderStocks();
+}, 60000);
+
+// Render stocks with updated prices
+function renderStocks() {
+  stockListEl.innerHTML = '';
+  stocks.forEach((stock, index) => {
     const li = document.createElement('li');
-    li.textContent = `${stock}: $${price.toFixed(2)} (Owned: ${owned})`;
-    li.onclick = () => openModal(stock);
-    stockList.appendChild(li);
-    
-    const option = document.createElement('option');
-    option.value = stock;
-    option.textContent = stock;
-    stockSelect.appendChild(option);
+    li.textContent = `${stock.name} - $${stock.price.toFixed(2)}`;
+    li.onclick = () => showStockInfo(index);
+    stockListEl.appendChild(li);
+  });
+}
+
+// Function to add money if balance is low
+function addFunds(amount) {
+  if (balance + amount <= maxFunds) {
+    balance += amount;
+    updateBalance();
+  } else {
+    alert(`Maximum balance of $${maxFunds} reached.`);
   }
 }
 
-updateDisplay(); // Call this on page load
+// Function to give feedback on investment choices
+function investmentFeedback(stock) {
+  if (stock.price < 100) {
+    return "Good choice! This stock is relatively low priced.";
+  } else if (stock.price > 150) {
+    return "Risky choice! This stock is expensive and might drop in value.";
+  } else {
+    return "Balanced choice. This stock has moderate value.";
+  }
+}
+
+// Chart setup to display investment distribution
+const ctx = document.getElementById('investmentChart').getContext('2d');
+const investmentChart = new Chart(ctx, {
+  type: 'pie',
+  data: {
+    labels: stocks.map(stock => stock.name),
+    datasets: [{
+      label: 'Investment Distribution',
+      data: stocks.map(stock => investments[stock.name] || 0),
+      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+    }]
+  },
+  options: {
+    responsive: true,
+  }
+});
+
+// Update chart based on current investments
+function updateChart() {
+  investmentChart.data.datasets[0].data = stocks.map(stock => investments[stock.name] || 0);
+  investmentChart.update();
+}
