@@ -1,3 +1,4 @@
+// Initial portfolio balance
 let balance = 1000;
 const feedbackElement = document.getElementById('feedback');
 const stockInfoElement = document.getElementById('stock-info');
@@ -9,6 +10,7 @@ const modalPrice = document.getElementById('modal-price');
 const modalOwned = document.getElementById('modal-owned');
 const modalChartElement = document.getElementById('modalChart').getContext('2d');
 
+// Example stocks with price history
 const stocks = {
   "TechCorp": { price: 50, owned: 0, description: "Leading tech company", history: [50] },
   "HealthInc": { price: 30, owned: 0, description: "Healthcare services", history: [30] },
@@ -18,16 +20,7 @@ const stocks = {
   "AutoDrive": { price: 35, owned: 0, description: "Automated vehicle producer", history: [35] }
 };
 
-// Primary chart for portfolio
-let stockChart = new Chart(stockChartElement, { /* ... same chart setup ... */ });
-
-// Modal chart for detailed stock view
-let modalChart = new Chart(modalChartElement, {
-  type: 'line',
-  data: { labels: [0], datasets: [{ label: 'Stock Price', data: [], borderColor: 'rgba(54, 162, 235, 1)', fill: false }] },
-  options: { responsive: true, scales: { x: { title: { text: 'Transactions' } }, y: { title: { text: 'Price ($)' } } } }
-});
-
+// Function to open the stock modal
 function openModal(stock) {
   const selectedStock = stocks[stock];
   modalTitle.textContent = stock;
@@ -43,28 +36,26 @@ function openModal(stock) {
   modal.style.display = "block";
 }
 
+// Function to close the modal
 function closeModal() {
   modal.style.display = "none";
 }
 
-// Event listener to close modal when clicking outside of it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    closeModal();
-  }
-}
-
+// Update the stock list dynamically
 function updateDisplay() {
   document.getElementById('balance').textContent = balance.toFixed(2);
+  const stockList = document.getElementById('stock-list');
+  const stockSelect = document.getElementById('stock-select');
+  
   stockList.innerHTML = '';
   stockSelect.innerHTML = '';
-
+  
   for (const stock in stocks) {
     const { price, owned, description } = stocks[stock];
     
     const li = document.createElement('li');
     li.textContent = `${stock}: $${price.toFixed(2)} (Owned: ${owned})`;
-    li.onclick = () => openModal(stock); // Add click event to open modal
+    li.onclick = () => openModal(stock);
     stockList.appendChild(li);
     
     const option = document.createElement('option');
@@ -73,33 +64,5 @@ function updateDisplay() {
     stockSelect.appendChild(option);
   }
 }
-// Function to add funds to balance with a maximum limit of $500
-function addFunds() {
-  const fundAmount = parseFloat(document.getElementById("fund-amount").value);
-  const fundFeedback = document.getElementById("fund-feedback");
 
-  // Check if fundAmount is valid and within allowed range
-  if (isNaN(fundAmount) || fundAmount < 1 || fundAmount > 500) {
-    fundFeedback.textContent = "Please enter an amount between 1 and 500.";
-    fundFeedback.style.color = "red";
-    return;
-  }
-
-  // Add the funds to the balance and update display
-  balance += fundAmount;
-  document.getElementById("balance").textContent = balance.toFixed(2);
-  fundFeedback.textContent = `$${fundAmount} added to your balance successfully!`;
-  fundFeedback.style.color = "green";
-
-  // Clear input field and reset feedback message after 3 seconds
-  document.getElementById("fund-amount").value = "";
-  setTimeout(() => {
-    fundFeedback.textContent = "";
-  }, 3000);
-}
-
-
-// Buy, sell, feedback functions (as previously set up)
-
-// Initial display
-updateDisplay();
+updateDisplay(); // Call this on page load
