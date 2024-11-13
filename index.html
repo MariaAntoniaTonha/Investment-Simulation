@@ -4,42 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Investment Simulation</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Investment Simulation</h1>
-  <div id="portfolio">
-    <h2>Your Portfolio</h2>
-    <p>Balance: $<span id="balance">1000</span></p>
-    <ul id="stock-list"></ul>
+  <div id="balance">Balance: $500</div>
+
+  <div id="stock-list">
+    <h2>Stocks</h2>
+    <ul id="stocks"></ul>
   </div>
 
-  <div id="trade">
-    <h2>Trade Stocks</h2>
-    <label for="stock-select">Choose a stock:</label>
-    <select id="stock-select"></select>
-    <p id="stock-info"></p>
-    <button onclick="buyStock()">Buy</button>
-    <button onclick="sellStock()">Sell</button>
-    <p id="feedback" class="feedback"></p>
+  <div id="stock-info">
+    <h2>Stock Information</h2>
+    <p id="stock-details">Click on a stock to view details.</p>
   </div>
 
-  <canvas id="stockChart" width="400" height="200"></canvas>
-
-  <!-- Stock Detail Modal -->
-  <div id="stockModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modal-title">Stock Details</h2>
-      <p id="modal-description"></p>
-      <p>Current Price: $<span id="modal-price"></span></p>
-      <p>Owned: <span id="modal-owned"></span></p>
-      <canvas id="modalChart" width="400" height="200"></canvas>
-    </div>
+  <div id="chart">
+    <h2>Investment Chart</h2>
+    <canvas id="investmentChart"></canvas>
   </div>
 
-  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
