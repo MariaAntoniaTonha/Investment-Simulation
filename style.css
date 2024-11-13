@@ -1,76 +1,32 @@
-/* Modal styling */
-/* Modal styling */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  padding-top: 60px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: auto;
+/* styles.css */
+body {
+  font-family: Arial, sans-serif;
   padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-  max-width: 500px;
+  background-color: #f4f4f4;
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+#balance {
+  font-size: 1.5em;
+  margin-bottom: 10px;
 }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+#stock-list {
+  margin-bottom: 20px;
+}
+
+#stocks li {
   cursor: pointer;
+  padding: 5px;
+  margin: 5px 0;
+  background-color: #e6e6e6;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  padding-top: 60px;
-  left: 0;
-  top: 0;
+#stock-info {
+  margin-top: 20px;
+}
+
+canvas {
   width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  max-width: 600px;
 }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-  max-width: 500px;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-#fund-feedback {
-  margin-top: 10px;
-  font-size: 0.9em;
-  color: green;
-}
