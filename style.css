@@ -1,0 +1,20 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+}
+
+#portfolio, #trade {
+  border: 1px solid #ddd;
+  margin: 20px;
+  padding: 20px;
+  display: inline-block;
+  width: 300px;
+}
+
+button {
+  margin: 5px;
+}
