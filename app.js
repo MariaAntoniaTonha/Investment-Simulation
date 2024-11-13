@@ -1,15 +1,16 @@
 // Initial variables
 let balance = 1000;
 const feedbackElement = document.getElementById('feedback');
+const stockInfoElement = document.getElementById('stock-info');
 
-// Define more stocks with initial prices and quantity owned
+// Define stocks with descriptions, initial prices, and quantity owned
 const stocks = {
-  "TechCorp": { price: 50, owned: 0 },
-  "HealthInc": { price: 30, owned: 0 },
-  "FinanceCo": { price: 20, owned: 0 },
-  "EnergyPlus": { price: 40, owned: 0 },
-  "GreenGrow": { price: 25, owned: 0 },
-  "AutoDrive": { price: 35, owned: 0 }
+  "TechCorp": { price: 50, owned: 0, description: "Leading tech company" },
+  "HealthInc": { price: 30, owned: 0, description: "Healthcare services" },
+  "FinanceCo": { price: 20, owned: 0, description: "Financial services firm" },
+  "EnergyPlus": { price: 40, owned: 0, description: "Renewable energy provider" },
+  "GreenGrow": { price: 25, owned: 0, description: "Sustainable agriculture" },
+  "AutoDrive": { price: 35, owned: 0, description: "Automated vehicle producer" }
 };
 
 // Populate stock list and dropdown
@@ -23,14 +24,29 @@ function updateDisplay() {
   stockList.innerHTML = '';
   stockSelect.innerHTML = '';
 
-  // Populate the stock list and dropdown with updated values
+  // Populate the stock list and dropdown with unique values
   for (const stock in stocks) {
-    stockSelect.innerHTML += `<option value="${stock}">${stock}</option>`;
+    const { price, owned, description } = stocks[stock];
+    
+    // Update the portfolio display
     const li = document.createElement('li');
-    li.textContent = `${stock}: $${stocks[stock].price.toFixed(2)} (Owned: ${stocks[stock].owned})`;
+    li.textContent = `${stock}: $${price.toFixed(2)} (Owned: ${owned}) - ${description}`;
     stockList.appendChild(li);
+    
+    // Update the dropdown menu
+    const option = document.createElement('option');
+    option.value = stock;
+    option.textContent = stock;
+    stockSelect.appendChild(option);
   }
 }
+
+// Show selected stock information when changed
+stockSelect.addEventListener("change", () => {
+  const stock = stockSelect.value;
+  const { price, description } = stocks[stock];
+  stockInfoElement.textContent = `${stock} - ${description}, Current Price: $${price.toFixed(2)}`;
+});
 
 // Simulate stock price changes
 function simulatePriceChange(stock) {
@@ -46,7 +62,7 @@ function buyStock() {
     balance -= stocks[stock].price;
     simulatePriceChange(stock);
     updateDisplay();
-    displayFeedback(`Bought 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`);
+    displayFeedback(`Bought 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`, "success");
   } else {
     displayFeedback("Not enough balance to buy!", "error");
   }
@@ -60,7 +76,7 @@ function sellStock() {
     balance += stocks[stock].price;
     simulatePriceChange(stock);
     updateDisplay();
-    displayFeedback(`Sold 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`);
+    displayFeedback(`Sold 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`, "success");
   } else {
     displayFeedback("You don't own any of this stock!", "error");
   }
@@ -69,11 +85,12 @@ function sellStock() {
 // Display feedback messages to the user
 function displayFeedback(message, type = "success") {
   feedbackElement.textContent = message;
-  feedbackElement.style.color = type === "error" ? "red" : "green";
+  feedbackElement.className = type === "error" ? "error" : "feedback";
 
   // Clear the feedback message after 3 seconds
   setTimeout(() => {
     feedbackElement.textContent = "";
   }, 3000);
 }
+
 
