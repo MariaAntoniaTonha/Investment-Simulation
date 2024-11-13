@@ -22,4 +22,13 @@ button {
 #feedback {
   margin-top: 10px;
   font-weight: bold;
+  transition: opacity 0.3s;
+}
+
+.feedback {
+  color: #28a745; /* green for success */
+}
+
+.error {
+  color: #dc3545; /* red for error */
 }
