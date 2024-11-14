@@ -1,44 +1,103 @@
-// Initial variables
+// Initialize balance and feedback element
 let balance = 1000;
 const feedbackElement = document.getElementById('feedback');
+const stockInfoElement = document.getElementById('stock-info');
+const stockChartElement = document.getElementById('stockChart').getContext('2d');
 
-// Define more stocks with initial prices and quantity owned
+// Define stocks with initial price, quantity owned, and price history
 const stocks = {
-  "TechCorp": { price: 50, owned: 0 },
-  "HealthInc": { price: 30, owned: 0 },
-  "FinanceCo": { price: 20, owned: 0 },
-  "EnergyPlus": { price: 40, owned: 0 },
-  "GreenGrow": { price: 25, owned: 0 },
-  "AutoDrive": { price: 35, owned: 0 }
+  "TechCorp": { price: 50, owned: 0, description: "Leading tech company", history: [50] },
+  "HealthInc": { price: 30, owned: 0, description: "Healthcare services", history: [30] },
+  "FinanceCo": { price: 20, owned: 0, description: "Financial services firm", history: [20] },
+  "EnergyPlus": { price: 40, owned: 0, description: "Renewable energy provider", history: [40] },
+  "GreenGrow": { price: 25, owned: 0, description: "Sustainable agriculture", history: [25] },
+  "AutoDrive": { price: 35, owned: 0, description: "Automated vehicle producer", history: [35] }
 };
 
-// Populate stock list and dropdown
+// Initialize the chart for stock prices
+let stockChart = new Chart(stockChartElement, {
+  type: 'line',
+  data: {
+    labels: [0], // Initial time label
+    datasets: [
+      {
+        label: 'Stock Price',
+        data: stocks["TechCorp"].history, // Start with TechCorp's price history
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Transaction Count'
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Price ($)'
+        }
+      }
+    }
+  }
+});
+
+// Update the chart to reflect selected stock's history
+function updateChart(stock) {
+  const stockData = stocks[stock].history;
+  stockChart.data.labels = Array.from({ length: stockData.length }, (_, i) => i);
+  stockChart.data.datasets[0].data = stockData;
+  stockChart.update();
+}
+
+// Populate stock list and dropdown, then display them
 const stockSelect = document.getElementById('stock-select');
 const stockList = document.getElementById('stock-list');
 updateDisplay();
 
 function updateDisplay() {
-  // Update balance
+  // Update balance and clear elements
   document.getElementById('balance').textContent = balance.toFixed(2);
   stockList.innerHTML = '';
   stockSelect.innerHTML = '';
 
-  // Populate the stock list and dropdown with updated values
+  // Add each stock to the list and dropdown menu
   for (const stock in stocks) {
-    stockSelect.innerHTML += `<option value="${stock}">${stock}</option>`;
+    const { price, owned, description } = stocks[stock];
+    
     const li = document.createElement('li');
-    li.textContent = `${stock}: $${stocks[stock].price.toFixed(2)} (Owned: ${stocks[stock].owned})`;
+    li.textContent = `${stock}: $${price.toFixed(2)} (Owned: ${owned}) - ${description}`;
     stockList.appendChild(li);
+    
+    const option = document.createElement('option');
+    option.value = stock;
+    option.textContent = stock;
+    stockSelect.appendChild(option);
   }
 }
 
-// Simulate stock price changes
+// Show selected stock information and update the chart
+stockSelect.addEventListener("change", () => {
+  const stock = stockSelect.value;
+  const { price, description } = stocks[stock];
+  stockInfoElement.textContent = `${stock} - ${description}, Current Price: $${price.toFixed(2)}`;
+  updateChart(stock);
+});
+
+// Randomly simulate stock price changes
 function simulatePriceChange(stock) {
   const randomChange = (Math.random() - 0.5) * 10; // Random change between -5 and +5
-  stocks[stock].price = Math.max(1, stocks[stock].price + randomChange);
+  stocks[stock].price = Math.max(1, stocks[stock].price + randomChange); // Price can't go below $1
+  stocks[stock].history.push(stocks[stock].price); // Append new price to history
 }
 
-// Buy stock function
+// Buy stock function with price change simulation
 function buyStock() {
   const stock = stockSelect.value;
   if (balance >= stocks[stock].price) {
@@ -46,13 +105,14 @@ function buyStock() {
     balance -= stocks[stock].price;
     simulatePriceChange(stock);
     updateDisplay();
-    displayFeedback(`Bought 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`);
+    displayFeedback(`Bought 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`, "success");
+    updateChart(stock);
   } else {
     displayFeedback("Not enough balance to buy!", "error");
   }
 }
 
-// Sell stock function
+// Sell stock function with price change simulation
 function sellStock() {
   const stock = stockSelect.value;
   if (stocks[stock].owned > 0) {
@@ -60,19 +120,21 @@ function sellStock() {
     balance += stocks[stock].price;
     simulatePriceChange(stock);
     updateDisplay();
-    displayFeedback(`Sold 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`);
+    displayFeedback(`Sold 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`, "success");
+    updateChart(stock);
   } else {
     displayFeedback("You don't own any of this stock!", "error");
   }
 }
 
-// Display feedback messages to the user
+// Function to display feedback messages to user
 function displayFeedback(message, type = "success") {
   feedbackElement.textContent = message;
-  feedbackElement.style.color = type === "error" ? "red" : "green";
+  feedbackElement.className = type === "error" ? "error" : "feedback";
 
-  // Clear the feedback message after 3 seconds
+  // Clear feedback message after 3 seconds
   setTimeout(() => {
     feedbackElement.textContent = "";
   }, 3000);
 }
+
