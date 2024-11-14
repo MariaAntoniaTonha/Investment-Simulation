@@ -1,100 +1,78 @@
-// script.js
-let balance = 500;
-const maxFunds = 500;
-const stocks = [
-  { name: "Stock A", price: 100 },
-  { name: "Stock B", price: 150 },
-  { name: "Stock C", price: 75 },
-  { name: "Stock D", price: 200 },
-  { name: "Stock E", price: 50 },
-  { name: "Stock F", price: 120 },
-];
-let investments = {};
+// Initial variables
+let balance = 1000;
+const feedbackElement = document.getElementById('feedback');
 
-const balanceEl = document.getElementById('balance');
-const stockListEl = document.getElementById('stocks');
-const stockDetailsEl = document.getElementById('stock-details');
+// Define more stocks with initial prices and quantity owned
+const stocks = {
+  "TechCorp": { price: 50, owned: 0 },
+  "HealthInc": { price: 30, owned: 0 },
+  "FinanceCo": { price: 20, owned: 0 },
+  "EnergyPlus": { price: 40, owned: 0 },
+  "GreenGrow": { price: 25, owned: 0 },
+  "AutoDrive": { price: 35, owned: 0 }
+};
 
-// Display available stocks
-stocks.forEach((stock, index) => {
-  const li = document.createElement('li');
-  li.textContent = `${stock.name} - $${stock.price}`;
-  li.onclick = () => showStockInfo(index);
-  stockListEl.appendChild(li);
-});
+// Populate stock list and dropdown
+const stockSelect = document.getElementById('stock-select');
+const stockList = document.getElementById('stock-list');
+updateDisplay();
 
-// Update the balance display
-function updateBalance() {
-  balanceEl.textContent = `Balance: $${balance}`;
-}
+function updateDisplay() {
+  // Update balance
+  document.getElementById('balance').textContent = balance.toFixed(2);
+  stockList.innerHTML = '';
+  stockSelect.innerHTML = '';
 
-// Show details about a stock when clicked
-function showStockInfo(index) {
-  const stock = stocks[index];
-  stockDetailsEl.textContent = `${stock.name}: $${stock.price}. ${
-    investments[stock.name] ? "You own shares." : "Click to buy."
-  }`;
-}
-
-// Function to simulate stock price changes every minute
-setInterval(() => {
-  stocks.forEach(stock => {
-    stock.price += (Math.random() - 0.5) * 5; // Simulate price change
-  });
-  renderStocks();
-}, 60000);
-
-// Render stocks with updated prices
-function renderStocks() {
-  stockListEl.innerHTML = '';
-  stocks.forEach((stock, index) => {
+  // Populate the stock list and dropdown with updated values
+  for (const stock in stocks) {
+    stockSelect.innerHTML += `<option value="${stock}">${stock}</option>`;
     const li = document.createElement('li');
-    li.textContent = `${stock.name} - $${stock.price.toFixed(2)}`;
-    li.onclick = () => showStockInfo(index);
-    stockListEl.appendChild(li);
-  });
+    li.textContent = `${stock}: $${stocks[stock].price.toFixed(2)} (Owned: ${stocks[stock].owned})`;
+    stockList.appendChild(li);
+  }
 }
 
-// Function to add money if balance is low
-function addFunds(amount) {
-  if (balance + amount <= maxFunds) {
-    balance += amount;
-    updateBalance();
+// Simulate stock price changes
+function simulatePriceChange(stock) {
+  const randomChange = (Math.random() - 0.5) * 10; // Random change between -5 and +5
+  stocks[stock].price = Math.max(1, stocks[stock].price + randomChange);
+}
+
+// Buy stock function
+function buyStock() {
+  const stock = stockSelect.value;
+  if (balance >= stocks[stock].price) {
+    stocks[stock].owned += 1;
+    balance -= stocks[stock].price;
+    simulatePriceChange(stock);
+    updateDisplay();
+    displayFeedback(`Bought 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`);
   } else {
-    alert(`Maximum balance of $${maxFunds} reached.`);
+    displayFeedback("Not enough balance to buy!", "error");
   }
 }
 
-// Function to give feedback on investment choices
-function investmentFeedback(stock) {
-  if (stock.price < 100) {
-    return "Good choice! This stock is relatively low priced.";
-  } else if (stock.price > 150) {
-    return "Risky choice! This stock is expensive and might drop in value.";
+// Sell stock function
+function sellStock() {
+  const stock = stockSelect.value;
+  if (stocks[stock].owned > 0) {
+    stocks[stock].owned -= 1;
+    balance += stocks[stock].price;
+    simulatePriceChange(stock);
+    updateDisplay();
+    displayFeedback(`Sold 1 share of ${stock} at $${stocks[stock].price.toFixed(2)}`);
   } else {
-    return "Balanced choice. This stock has moderate value.";
+    displayFeedback("You don't own any of this stock!", "error");
   }
 }
 
-// Chart setup to display investment distribution
-const ctx = document.getElementById('investmentChart').getContext('2d');
-const investmentChart = new Chart(ctx, {
-  type: 'pie',
-  data: {
-    labels: stocks.map(stock => stock.name),
-    datasets: [{
-      label: 'Investment Distribution',
-      data: stocks.map(stock => investments[stock.name] || 0),
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
-    }]
-  },
-  options: {
-    responsive: true,
-  }
-});
+// Display feedback messages to the user
+function displayFeedback(message, type = "success") {
+  feedbackElement.textContent = message;
+  feedbackElement.style.color = type === "error" ? "red" : "green";
 
-// Update chart based on current investments
-function updateChart() {
-  investmentChart.data.datasets[0].data = stocks.map(stock => investments[stock.name] || 0);
-  investmentChart.update();
+  // Clear the feedback message after 3 seconds
+  setTimeout(() => {
+    feedbackElement.textContent = "";
+  }, 3000);
 }
